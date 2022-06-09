@@ -16,7 +16,7 @@ def transform_image(pillow_image):
     data = np.asarray(pillow_image)
     data = data / 255.0
     data = tf.image.resize(data, [400, 400])
-    data = np.expand_dims(data, 0)  # Nambahin dimensi didiepan
+    data = np.expand_dims(data, 0)
     return data
 
 
@@ -31,13 +31,12 @@ def predict(x):
 app = Flask(__name__)
 
 
-@app.route("/", methods=["get"])
-def index():
+@app.route("/", methods=["GET"])
+def root():
     return "OK"
 
-
 @app.route("/predict", methods=["GET", "POST"])
-def predict():
+def index():
     if request.method == "POST":
         file = request.files.get('file')
         if file is None or file.filename == "":
@@ -46,7 +45,7 @@ def predict():
         try:
             image_bytes = file.read()
             pillow_img = Image.open(io.BytesIO(
-                image_bytes))  # Diapus convert('L')
+                image_bytes))
             tensor = transform_image(pillow_img)
             prediction = predict(tensor)
             fish = get_one(prediction)
@@ -59,4 +58,4 @@ def predict():
 
 
 if __name__ == "__main__":
-    app.run(host='127.0.0.1', port=8080, debug=True)
+    app.run(host='127.0.0.1', port=8080, debug=False)

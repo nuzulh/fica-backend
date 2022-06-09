@@ -1,6 +1,5 @@
 import os
 import pymysql
-from flask import jsonify
 
 db_user = os.environ.get('CLOUD_SQL_USERNAME')
 db_password = os.environ.get('CLOUD_SQL_PASSWORD')
@@ -9,22 +8,15 @@ db_connection_name = os.environ.get('CLOUD_SQL_CONNECTION_NAME')
 
 
 def open_connection():
-    # When deployed to App Engine, the `GAE_ENV` environment variable will be
-    # set to `standard`
     if os.environ.get('GAE_ENV') == 'standard':
-        # If deployed, use the local socket interface for accessing Cloud SQL
         unix_socket = '/cloudsql/{}'.format(db_connection_name)
         cnx = pymysql.connect(user=db_user, password=db_password,
                               unix_socket=unix_socket, db=db_name)
         return cnx
     else:
-        # If running locally, use the TCP connections instead
-        # Set up Cloud SQL Proxy (cloud.google.com/sql/docs/mysql/sql-proxy)
-        # so that your application can use 127.0.0.1:3306 to connect to your
-        # Cloud SQL instance
         host = '127.0.0.1'
-        cnx = pymysql.connect(user=db_user, password=db_password,
-                              host=host, db=db_name)
+        cnx = pymysql.connect(user='root', password='',
+                              host=host, db='fica')
         return cnx
 
 
@@ -34,18 +26,28 @@ def get():
         result = cursor.execute('SELECT * FROM fish;')
         fishes = cursor.fetchall()
         if result > 0:
-            return jsonify(fishes)
-        return 'No fish found by id'+id
+            return fishes
+        else:
+            return {'message': 'No fishes found'}
 
 
-def get_one(id):
+def get_one(label):
     conn = open_connection()
     with conn.cursor() as cursor:
-        result = cursor.execute('SELECT * FROM fish WHERE label=%s', (id))
+        result = cursor.execute('SELECT * FROM fish WHERE label=%s', (label))
         fish = cursor.fetchall()
         if result > 0:
-            return jsonify(fish)
-        return 'No fish found by id'+id
+            fish = fish[0]
+            res = {}
+            for _ in range(len(fish)):
+                res["label"] = fish[1]
+                res["name"] = fish[2]
+                res["description"] = fish[3]
+                res["min_price"] = fish[4]
+                res["max_price"] = fish[5]
+            return res
+        else:
+            return {'message': f'No fishes found by label {label}'}
 
 
 def create(fish):
