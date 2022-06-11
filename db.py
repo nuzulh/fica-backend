@@ -31,10 +31,10 @@ def get():
             return {'message': 'No fishes found'}
 
 
-def get_one(label):
+def get_one(prediction):
     conn = open_connection()
     with conn.cursor() as cursor:
-        result = cursor.execute('SELECT * FROM fish WHERE label=%s', (label))
+        result = cursor.execute('SELECT * FROM fish WHERE label=%s', (prediction[0])) #Label
         fish = cursor.fetchall()
         if result > 0:
             fish = fish[0]
@@ -45,9 +45,10 @@ def get_one(label):
                 res["description"] = fish[3]
                 res["min_price"] = fish[4]
                 res["max_price"] = fish[5]
+                res["probability"] = float(prediction[1]) #Nambahin probability
             return res
         else:
-            return {'message': f'No fishes found by label {label}'}
+            return {'message': f'No fishes found by label {prediction[0]}'}
 
 
 def create(fish):
