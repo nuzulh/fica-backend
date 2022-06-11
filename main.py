@@ -28,10 +28,15 @@ def transform_image(pillow_image):
 def predict(x):
     predictions = model(x)
     predictions = tf.nn.softmax(predictions)
-    pred0 = predictions[0]
-    label0 = np.argmax(pred0)
-    prob0 = pred0[label0].numpy()
-    return (label0,prob0) # Outputnya (label,probabilitas)
+    pred0 = predictions[0].numpy()
+    labels = np.argsort(pred0)[-3:]
+    result = []
+    for label in range(2,-1,-1):
+        idx = labels[label]
+        result.append((idx,pred0[idx]))
+    #label0 = np.argmax(pred0)
+    #prob0 = pred0[label0].numpy()
+    return result #(label0,prob0)
 
 app = Flask(__name__)
 
@@ -57,4 +62,4 @@ def index():
 
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(debug=False)

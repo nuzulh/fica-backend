@@ -33,23 +33,25 @@ def get():
 
 def get_one(prediction):
     conn = open_connection()
+    predict_list = {}
     with conn.cursor() as cursor:
-        result = cursor.execute('SELECT * FROM fish WHERE label=%s', (prediction[0])) #Label
-        fish = cursor.fetchall()
-        if result > 0:
-            fish = fish[0]
-            res = {}
-            for _ in range(len(fish)):
-                res["label"] = fish[1]
-                res["name"] = fish[2]
-                res["description"] = fish[3]
-                res["min_price"] = fish[4]
-                res["max_price"] = fish[5]
-                res["probability"] = float(prediction[1]) #Nambahin probability
-            return res
-        else:
-            return {'message': f'No fishes found by label {prediction[0]}'}
-
+        for i in range(len(prediction)):
+            result = cursor.execute('SELECT * FROM fish WHERE label=%s', (prediction[i][0])) 
+            fish = cursor.fetchall()
+            if result > 0:
+                fish = fish[0]
+                res = {}
+                for _ in range(len(fish)):
+                    res["label"] = fish[1]
+                    res["name"] = fish[2]
+                    res["description"] = fish[3]
+                    res["min_price"] = fish[4]
+                    res["max_price"] = fish[5]
+                    res["probability"] = float(prediction[i][1])
+                predict_list[i] = res #return res
+            else:
+                return {'message': 'No fishes found'}
+        return predict_list
 
 def create(fish):
     conn = open_connection()

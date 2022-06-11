@@ -3,7 +3,7 @@ runtime: python39
 instance_class: F4_1G
 
 env_variables:
-  CLOUD_SQL_USERNAME: gtw
-  CLOUD_SQL_PASSWORD: gtw
-  CLOUD_SQL_DATABASE_NAME: gtw
-  CLOUD_SQL_CONNECTION_NAME: gtw
+  CLOUD_SQL_USERNAME: root
+  CLOUD_SQL_PASSWORD: bangkit2022
+  CLOUD_SQL_DATABASE_NAME: fica
+  CLOUD_SQL_CONNECTION_NAME: fica-351917:asia-southeast2:fica-db
